@@ -17,6 +17,10 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
             return res.status(400).json( {error: "Status value is not valid"} );
         }
 
+        if(fromUserId.toString() === toUserId) {
+            return res.status(400).json( {error: "You cannot send request to yourself"} );
+        }
+
         const toUser = await User.findById(toUserId);
         if(!toUser) {
             return res.status(404).json( {error: "The user you are trying to connect is not found"} );
@@ -39,6 +43,31 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
         res.status(200).send( {message: "Connection request sent successfully", request: newRequest} );
     }
     catch(err) {
+        res.status(500).json( {"ERROR ": + err.message} );
+    }
+});
+
+// accept or reject the connection request
+requestRouter.post("/request/review/:status/:requestId", userAuth, async (req, res) => {
+    const userId = req.user._id;
+    const {status, requestId} = req.params;
+
+    try {
+        const allowedStatus = ['accepted', 'rejected'];
+        if( !(allowedStatus.includes(status)) ) {
+            return res.status(400).json( {error: "Status value is not valid"} );
+        }
+
+        const connectionRequest = await ConnectionRequest.findOne( {_id: requestId, toUserId: userId, status: "interested"} );
+        if(!connectionRequest) {
+            return res.status(404).json( {error: "Connection request not found"} );
+        }
+
+        connectionRequest.status = status;
+        await connectionRequest.save();
+        res.status(200).json( {message: `Connection request ${status} successfully`, request: connectionRequest} );
+
+    } catch(err) {
         res.status(500).json( {"ERROR ": + err.message} );
     }
 });
