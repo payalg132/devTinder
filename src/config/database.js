@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
 
-const connectDB = mongoose.connect("mongodb+srv://payalg132:root@namastenode.ywvbfar.mongodb.net/devTinder");
+const connectDB = mongoose.connect(process.env.DB_CONNECTION_STRING);
 
 module.exports = {connectDB};
