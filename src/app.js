@@ -2,7 +2,12 @@ const express = require("express");
 const {connectDB} = require("./config/database");
 const app = express();  
 const cookie = require("cookie-parser");
+const cors = require("cors");
 
+app.use(cors( {
+    origin: "http://localhost:5173",
+    credentials: true,
+} ));
 app.use(express.json());
 app.use(cookie());
 
@@ -23,6 +28,6 @@ connectDB.then(() => {
     });
 })
 .catch((err) => {
-    console.log("Error in databse connection");
+    console.log("Error : ", err.message);
 });
 

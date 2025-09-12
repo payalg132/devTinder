@@ -11,14 +11,14 @@ userRouter.get("/user/request/recieved", userAuth, async (req, res) => {
         const user = await connectionRequest.find({
             toUserId: loggedInUSer._id, status: "interested"
         }).populate(
-            "fromUserId", ["firstName", "lastName"]
+            "fromUserId", "firstName lastName photoUrl about skills age gender"
         );
 
         if(!user) {
             return res.status(404).json( {error: "No connection request found"} );
         }
 
-        res.status(200).send( {message: "Connection requests fetched successfully", user} );
+        res.json(user);
     } catch(err) {
         res.status(400).json( {"ERROR ": + err.message} );
     }  
@@ -33,7 +33,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
                 {fromUserId: loggedInUSer._id, status: "accepted"},
                 {toUserId: loggedInUSer._id, status: "accepted"}
             ]
-        }).populate( "fromUserId", ["firstName", "lastName"] ).populate( "toUserId", ["firstName", "lastName"] );
+        }).populate( "fromUserId", "firstName lastName photoUrl about skills age gender" ).populate( "toUserId", "firstName lastName photoUrl about skills age gender" );
 
         const data = connections.map( (connection) => {
             if(connection.fromUserId._id.toString() === loggedInUSer._id.toString()) {

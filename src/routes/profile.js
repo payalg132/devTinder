@@ -7,7 +7,7 @@ const User = require("../models/user");
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
     try{
        const userProfile = req.user;
-        res.status(200).json(userProfile);
+        res.status(200).send(userProfile);
     } catch(err){
         return res.status(401).send("ERROR : " + err.message);
     }
@@ -17,7 +17,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     try{
 
         const user = req.user;
-        const allowedUpdates = ['firstName', 'lastName', 'age', 'photoUrl', 'about','skills'];
+        const allowedUpdates = ['firstName', 'lastName', 'age', 'gender', 'photoUrl', 'about','skills'];
         const isValidUPdate = Object.keys(req.body).every((field) => allowedUpdates.includes(field));
 
         if(!isValidUPdate){
@@ -26,7 +26,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 
         Object.keys(req.body).forEach((field) => user[field] = req.body[field]);
         await user.save();
-        res.status(200).send({message: "Profile updated successfully", data: user});
+        res.status(200).send(user);
     } catch(err){
         return res.status(401).send("ERROR : " + err.message);
     }
